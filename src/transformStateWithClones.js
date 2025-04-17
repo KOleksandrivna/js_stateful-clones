@@ -8,35 +8,36 @@
  */
 function transformStateWithClones(state, actions) {
   // write code here
-
+  let currentState = { ...state }; // Початкова копія
   const results = [];
-  let currentState = { ...state };
 
   for (const action of actions) {
-    let newState = { ...currentState };
+    switch (action.type) {
+      case 'clear':
+        currentState = {}; // Порожній об'єкт
+        break;
 
-    if (action.type === 'clear') {
-      newState = {};
+      case 'addProperties':
+        currentState = { ...currentState, ...action.extraData };
+        break;
+
+      case 'removeProperties':
+        currentState = { ...currentState }; // копія
+
+        for (const key of action.keysToRemove) {
+          delete currentState[key];
+        }
+        break;
+
+      default:
+        // ігноруємо невідомі типи дій
+        break;
     }
 
-    if (action.type === 'addProperties') {
-      for (const key in action.extraData) {
-        newState[key] = action.extraData[key];
-      }
-    }
-
-    if (action.type === 'removeProperties') {
-      for (const key of action.keysToRemove) {
-        delete newState[key];
-      }
-    }
-
-    currentState = newState;
-    results.push(currentState);    
+    results.push({ ...currentState }); // Зберігаємо копію у results
   }
 
   return results;
-
 }
 
 module.exports = transformStateWithClones;
